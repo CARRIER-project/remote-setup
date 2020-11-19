@@ -1,3 +1,5 @@
+#!/usr/bin/env sh
+
 # Install docker from repository
 
 sudo apt update
