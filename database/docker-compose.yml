@@ -1,0 +1,12 @@
+version: "3"
+
+services:
+  db:
+    image: postgres
+    environment:
+      - "POSTGRES_DB=vantage"
+      - "PGDATA=/data"
+    ports:
+      - 5433:5432
+    volumes:
+      - ./pgdata:/scratch/pgdata
