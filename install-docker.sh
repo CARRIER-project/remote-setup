@@ -1,8 +1,8 @@
 #!/usr/bin/env sh
 # Install docker from repository
 
-sudo apt update
-sudo apt-get install \
+apt update
+apt-get install \
     apt-transport-https \
     ca-certificates \
     curl \
@@ -11,10 +11,16 @@ sudo apt-get install \
 
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
 
-sudo add-apt-repository \
+add-apt-repository \
    "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
    $(lsb_release -cs) \
    stable"
 
-sudo apt-get update
-sudo apt-get install docker-ce docker-ce-cli containerd.io
+apt-get update
+apt-get install docker-ce docker-ce-cli containerd.io
+
+
+# Install latest stable docker-compose
+curl -L "https://github.com/docker/compose/releases/download/1.27.4/docker-compose-$(uname -s)-$(uname -m)" -o
+/usr/local/bin/docker-compose
+chmod +x /usr/local/bin/docker-compose
