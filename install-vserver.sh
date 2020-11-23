@@ -1,15 +1,7 @@
 #!/usr/bin/env sh
 
-
-# Install miniconda for root
-
-MINICONDA_URL=https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
-
-sudo su
-mkdir /app
-cd /app || exit
+./install-miniconda.sh
+./install-docker.sh
 
 
-
-curl -o miniconda.sh $MINICONDA_URL
-sh ./miniconda.sh
+pip install vantage6
