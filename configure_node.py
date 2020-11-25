@@ -25,9 +25,9 @@ ORGANIZATION_BASE = ORGANIZATION = {'address1': 'my address 1, Amsterdam',
 
 
 @click.command()
-@click.argument('name')
-@click.option('--username')
-@click.option('--password', default=ADMIN_PASSWORD)
+@click.argument('name', prompt=True)
+@click.option('--username', prompt=True)
+@click.option('--password', prompt=True)
 def create_node(name, username, password):
     client = VantageClient(USERNAME, PASSWORD)
 
