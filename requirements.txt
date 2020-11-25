@@ -1,3 +1,5 @@
 scikit-learn
 pandas
 click
+vantage6
+requests
