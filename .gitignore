@@ -2,3 +2,4 @@ diabetes.csv
 .idea/
 venv/
 lokum/config/variables.tf
+ansible/hosts
