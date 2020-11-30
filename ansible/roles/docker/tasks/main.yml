@@ -1,0 +1,37 @@
+---
+# tasks file for docker
+- name: Install prerequisites for using apt update_cache
+  become: yes
+  apt:
+    pkg:
+      - apt-transport-https
+      - python3-apt
+      - aptitude
+- name: Install prerequisites for docker
+  become: yes
+  apt:
+    pkg:
+      - ca-certificates
+      - curl
+      - gnupg-agent
+      - software-properties-common
+
+- name: Add key from docker
+  become: yes
+  apt_key:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    state: present
+
+- name: Add docker repository
+  become: yes
+  apt_repository:
+    repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable
+
+- name: Install docker CE
+  become: yes
+  apt:
+    pkg:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+

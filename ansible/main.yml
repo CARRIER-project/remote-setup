@@ -1,0 +1,7 @@
+---
+- name: Install vantage6
+  hosts:
+    - nodes
+    - servers
+  roles:
+    - docker
