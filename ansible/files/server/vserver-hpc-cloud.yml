@@ -17,5 +17,5 @@ environments:
       max_size: 1024
       use_console: true
     port: '5000'
-    uri: postgresql://{{postgres_user}}:{{postgres_password}}@{{postgres_host}}/vantage
+    uri: "postgresql://{{postgres_user}}:{{postgres_password}}@{{postgres_host}}:5432/vantage"
   test: {}

@@ -37,11 +37,23 @@
   roles:
     - vantage6
   tasks:
+    - name: Create app dir
+      become: yes
+      file:
+        path: /app
+        state: directory
+
     - name: Create vantage6 server config file
       become: yes
       template:
         src: files/server/vserver-hpc-cloud.yml
-        dest: /etc/xdg/vantage6/server/vserver-hpc-cloud.yml
+        dest: /app/vserver-hpc-cloud.yml
+
+    - name: Copy docker compose
+      become: yes
+      copy:
+        src: files/server/docker-compose.yml
+        dest: /app/docker-compose.yml
 
     - name: Start vantage6 server
       become: yes
@@ -51,7 +63,47 @@
           LC_ALL: C.UTF-8
           LANG: C.UTF-8
       shell:
-        cmd: vserver start -c /etc/xdg/vantage6/server/vserver-hpc-cloud.yml
+        chdir: /app
+        cmd: docker-compose up -d
+
+- name: Create root user in database
+  hosts:
+    - databases
+  tasks:
+    - name: Install psycopg2
+      become: yes
+      pip:
+        name: psycopg2-binary
+
+    -
+    - name: Create authenticatable entity for root user
+      community.general.postgresql_query:
+        db: vantage
+        login_host: localhost
+        login_password: "{{postgres_password}}"
+        login_user: vantage
+        query: "INSERT INTO authenticatable (type) VALUES (user) RETURNING id;"
+      # TODO: Better error handling
+      ignore_errors: True
+      register: query_result
+    - name: Create root user with newly created id
+      community.general.postgresql_query:
+        db: vantage
+        login_host: localhost
+        login_password: "{{postgres_password}}"
+        login_user: vantage
+        query: >-
+          INSERT INTO "user" (id, username, password, email) values ({{query_result.query_result[0].id}},
+          'root', '{{vantage6_root_password}}', '');
+      ignore_errors: True
+
 
 - name: Configure vantage6 node
+  hosts:
+    - nodes
+  roles:
+    - vantage6
+
+
+
 
