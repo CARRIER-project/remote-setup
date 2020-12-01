@@ -1,0 +1,6 @@
+- name: Install prerequisites
+  become: yes
+  apt:
+    pkg:
+      - python3-setuptools
+      - python3-pip

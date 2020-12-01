@@ -7,7 +7,7 @@ environments:
     api_path: /api
     description: Vantage server on hpc cloud
     ip: 0.0.0.0
-    jwt_secret_key:
+    jwt_secret_key: "{{jwt_secret_key}}"
     logging:
       backup_count: 5
       datefmt: '%Y-%m-%d %H:%M:%S'
@@ -17,5 +17,5 @@ environments:
       max_size: 1024
       use_console: true
     port: '5000'
-    uri: sqlite:///default.sqlite
+    uri: postgresql://{{postgres_user}}:{{postgres_password}}@{{postgres_host}}/vantage
   test: {}

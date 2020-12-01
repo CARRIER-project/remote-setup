@@ -1,7 +1,57 @@
 ---
-- name: Install vantage6
+- name: Install postgres database
   hosts:
-    - nodes
-    - servers
+    - databases
   roles:
     - docker
+  tasks:
+    - name: Create app dir
+      become: yes
+      file:
+        path: /app
+        state: directory
+
+    - name: Copy docker compose to /app
+      become: yes
+      copy:
+        src: ./files/database/docker-compose.yml
+        dest: /app/
+
+    - name: Set variables for docker compose
+      become: yes
+      copy:
+        dest: /app/.env
+        content: |
+          POSTGRES_USER={{postgres_user}}
+          POSTGRES_PASSWORD={{postgres_password}}
+
+    - name: Run database
+      become: yes
+      shell:
+        chdir: /app
+        cmd: docker-compose up -d
+
+- name: Configure vantage6 server
+  hosts:
+    servers
+  roles:
+    - vantage6
+  tasks:
+    - name: Create vantage6 server config file
+      become: yes
+      template:
+        src: files/server/vserver-hpc-cloud.yml
+        dest: /etc/xdg/vantage6/server/vserver-hpc-cloud.yml
+
+    - name: Start vantage6 server
+      become: yes
+      async: 10
+      poll: 2
+      environment:
+          LC_ALL: C.UTF-8
+          LANG: C.UTF-8
+      shell:
+        cmd: vserver start -c /etc/xdg/vantage6/server/vserver-hpc-cloud.yml
+
+- name: Configure vantage6 node
+
