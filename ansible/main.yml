@@ -29,7 +29,7 @@
       become: yes
       shell:
         chdir: /app
-        cmd: docker-compose up -d
+        cmd: docker-compose down && docker-compose up -d
 
 - name: Configure vantage6 server
   hosts:
@@ -42,68 +42,188 @@
       file:
         path: /app
         state: directory
-
+    - name: Copy server files
+      become: yes
+      copy:
+        src: files/server/
+        dest: /app/
     - name: Create vantage6 server config file
       become: yes
       template:
         src: files/server/vserver-hpc-cloud.yml
         dest: /app/vserver-hpc-cloud.yml
 
-    - name: Copy docker compose
-      become: yes
-      copy:
-        src: files/server/docker-compose.yml
-        dest: /app/docker-compose.yml
-
     - name: Start vantage6 server
       become: yes
-      async: 10
-      poll: 2
-      environment:
-          LC_ALL: C.UTF-8
-          LANG: C.UTF-8
       shell:
         chdir: /app
-        cmd: docker-compose up -d
+        cmd: docker-compose down && docker-compose up -d
+    - name: Check whether the vantage6 server is running
+      register: result
+      until: "result.msg.find('OK') != -1"
+      retries: 3
+      delay: 5
+      uri:
+        url: http://localhost:5000/api/version
 
-- name: Create root user in database
-  hosts:
-    - databases
-  tasks:
-    - name: Install psycopg2
-      become: yes
-      pip:
-        name: psycopg2-binary
-
-    -
-    - name: Create authenticatable entity for root user
-      community.general.postgresql_query:
-        db: vantage
-        login_host: localhost
-        login_password: "{{postgres_password}}"
-        login_user: vantage
-        query: "INSERT INTO authenticatable (type) VALUES (user) RETURNING id;"
-      # TODO: Better error handling
-      ignore_errors: True
-      register: query_result
-    - name: Create root user with newly created id
-      community.general.postgresql_query:
-        db: vantage
-        login_host: localhost
-        login_password: "{{postgres_password}}"
-        login_user: vantage
-        query: >-
-          INSERT INTO "user" (id, username, password, email) values ({{query_result.query_result[0].id}},
-          'root', '{{vantage6_root_password}}', '');
-      ignore_errors: True
-
+#- name: Create root user in database
+#  hosts:
+#    - databases
+#  tasks:
+#    - name: Install essential python packages
+#      become: yes
+#      pip:
+#        name:
+#          - psycopg2-binary
+#    - name: Create authenticatable entity for root user
+#      community.general.postgresql_query:
+#        db: vantage
+#        login_host: localhost
+#        login_password: "{{postgres_password}}"
+#        login_user: vantage
+#        query: "INSERT INTO authenticatable (type) VALUES (user) RETURNING id;"
+#      # TODO: Better error handling
+#      ignore_errors: True
+#      register: query_result
+#    - name: Create root user with newly created id
+#      community.general.postgresql_query:
+#        db: vantage
+#        login_host: localhost
+#        login_password: "{{postgres_password}}"
+#        login_user: vantage
+#        query: >-
+#          INSERT INTO "user" (id, username, password, firstname, lastname, email, roles, organization_id) VALUES
+#          ({{query_result.query_result[0].id}}, 'root',
+#          '{{vantage6_root_password | password_hash('bcrypt') | replace('/', '.')}}', '', '',
+#          '', 'root', null)
+#      ignore_errors: True
+# Workaround because starting vantage server fails without a root user
 
 - name: Configure vantage6 node
   hosts:
     - nodes
   roles:
     - vantage6
+    - python-basic
+  tasks:
+    - name: Create app dir
+      become: yes
+      file:
+        path: /app
+        state: directory
+    - name: Copy required files for node
+      become: yes
+      copy:
+        src: files/node/
+        dest: /app/
+    - name: Copy dependencies
+      become: yes
+      pip:
+        name:
+          - sklearn
+          - click
+          - requests
+          - bcrypt
+    - name: Download sample data
+      become: yes
+      shell:
+        chdir: /app
+        cmd: python3 download_sample_data.py
+    - name: Check if sample data file exists
+      stat:
+        path: /app/diabetes.csv
+      register: st
+    - fail:
+        msg: "Sample data doesn't exist"
+      when: st.stat.exists == False
+    - name: Generate RSA keypair
+      become: yes
+      community.crypto.openssh_keypair:
+        path: /app/node_rsa
 
+    - name: Create organization and collaboration
+      shell:
+        chdir: /app
+        cmd: >
+          python3 configure_node.py dummy --root_password {{vantage6_root_password}} --username dummy --password
+          {{dummy_password}} --host {{vserver_host}} --port 5000 --email {{admin_email}}
 
+- name: Install docker registry and push python algorithms
+  roles:
+    - docker
+  hosts:
+    - registries
+  tasks:
+    - name: Install cryptography libraries
+      become: yes
+      pip:
+        name:
+          - cryptography
+          - PyOpenSSL
+    - name: Create app dir for registry
+      become: yes
+      file:
+        path: /app
+        state: directory
+    - name: Copy docker-compose for registry
+      become: yes
+      template:
+        src: files/registry/docker-compose.yml
+        dest: /app/docker-compose.yml
+    - name: Create certs dir
+      become: yes
+      file:
+        path: /app/certs
+        state: directory
 
+    - name: Create private key
+      become: yes
+      openssl_privatekey:
+        path: /app/certs/{{inventory_hostname}}.key
+        size: 2048
 
+    - name: Create csr
+      become: yes
+      openssl_csr:
+        path: /app/certs/{{inventory_hostname}}.csr
+        privatekey_path: /app/certs/{{inventory_hostname}}.key
+
+    - name: Create certificate
+      become: yes
+      openssl_certificate:
+        path: /app/certs/{{inventory_hostname}}.crt
+        privatekey_path: /app/certs/{{inventory_hostname}}.key
+        csr_path: /app/certs/{{inventory_hostname}}.csr
+        provider: selfsigned
+    - name: Create local certs directory
+      delegate_to: localhost
+      file:
+        path: files/certs
+        state: directory
+
+    - name: Retrieve certificate to distribute to nodes
+      fetch:
+        src: /app/certs/{{inventory_hostname}}.crt
+        dest: files/certs/{{inventory_hostname}}.crt
+        flat: True
+
+    - name: Run registry
+      become: yes
+      shell:
+        chdir: /app
+        cmd: docker-compose down && docker-compose up -d
+
+- name: Copy self signed certificate to nodes
+  hosts:
+    - nodes
+  tasks:
+    - name: Create directory for certificate
+      become: yes
+      file:
+        state: directory
+        path: /etc/docker/certs.d/{{registry_host}}
+    - name: Copy crt to node
+      become: yes
+      copy:
+        src: files/certs/{{registry_host}}.crt
+        dest: /etc/docker/certs.d/{{registry_host}}/ca.crt

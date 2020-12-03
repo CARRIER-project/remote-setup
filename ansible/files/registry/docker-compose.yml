@@ -1,0 +1,13 @@
+version: '3'
+
+services:
+  registry:
+    image: registry:2
+    ports:
+      - 443:443
+    environment:
+      - REGISTRY_HTTP_ADDR=0.0.0.0:443
+      - REGISTRY_HTTP_TLS_CERTIFICATE=/certs/{{inventory_hostname}}.crt
+      - REGISTRY_HTTP_TLS_KEY=/certs/{{inventory_hostname}}.key
+    volumes:
+      - /app/certs:/certs

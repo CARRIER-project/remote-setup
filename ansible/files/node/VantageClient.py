@@ -19,13 +19,13 @@ class VantageClient:
     def __init__(self, username, password, host, port):
         self.host = host
         self.port = port
+
         # Retrieve a authentication token
         self.token = self.get_token(username, password)
         self.headers = {
             'Authorization': f'Bearer {self.token}',
             'Content-Type': DEFAULT_CONTENT_TYPE
         }
-
 
     def get_server_root(self):
         return f'{self.host}:{self.port}/{PREFIX}/'

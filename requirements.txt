@@ -2,4 +2,5 @@ scikit-learn
 pandas
 click
 vantage6
+vantage6-client
 requests
