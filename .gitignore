@@ -4,3 +4,4 @@ venv/
 lokum/config/variables.tf
 ansible/hosts
 ansible/hosts.ymlansible/files/certs
+.ipynb_checkpoints

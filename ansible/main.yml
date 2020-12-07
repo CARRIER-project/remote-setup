@@ -179,7 +179,7 @@
     - name: Create private key
       become: yes
       openssl_privatekey:
-        path: /app/certs/{{inventory_hostname}}.key
+        path: "/app/certs/{{inventory_hostname}}.key"
         size: 2048
 
     - name: Create csr
@@ -187,6 +187,7 @@
       openssl_csr:
         path: /app/certs/{{inventory_hostname}}.csr
         privatekey_path: /app/certs/{{inventory_hostname}}.key
+        subject_alt_name: "IP:{{inventory_hostname}}"
 
     - name: Create certificate
       become: yes
@@ -221,9 +222,13 @@
       become: yes
       file:
         state: directory
-        path: /etc/docker/certs.d/{{registry_host}}
+        path: /etc/docker/certs.d/{{registry_host}}:443
     - name: Copy crt to node
       become: yes
       copy:
         src: files/certs/{{registry_host}}.crt
-        dest: /etc/docker/certs.d/{{registry_host}}/ca.crt
+        dest: /etc/docker/certs.d/{{registry_host}}:443/ca.crt
+    - name: Check if images can be pulled from registry
+      become: yes
+      shell:
+        cmd: "docker pull {{registry_host}}:443/v6-carrier-py"
