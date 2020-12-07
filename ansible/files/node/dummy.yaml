@@ -1,0 +1,24 @@
+application: {}
+environments:
+  acc: {}
+  dev: {}
+  prod:
+    api_key: {{node_api_key}}
+    api_path: /api
+    databases:
+      default: /app/diabetes.csv
+    encryption:
+      enabled: true
+      private_key: /app/node_rsa
+    logging:
+      backup_count: 5
+      datefmt: '%Y-%m-%d %H:%M:%S'
+      file: dummy.log
+      format: '%(asctime)s - %(name)-14s - %(levelname)-8s - %(message)s'
+      level: DEBUG
+      max_size: 1024
+      use_console: true
+    port: '5000'
+    server_url: "http://{{vserver_host}}"
+    task_dir: /usr/local/share/vantage6/node/dummy
+  test: {}

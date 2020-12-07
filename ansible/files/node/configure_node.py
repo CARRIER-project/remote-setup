@@ -37,11 +37,11 @@ def create_node(name, root_password, username, password, host, port, email):
 
     result = client.post('node', {'collaboration_id': collaboration_id, 'organization_id': org_id})
 
-    click.echo(result)
+    click.echo(result['api_key'])
 
 
 def create_collaboration(client, org_id):
-    result = client.post('collaboration', {'organization_ids': [org_id], 'name': 'dummy'})
+    result = client.post('collaboration', {'organization_ids': [org_id], 'name': f'dummy{org_id}'})
 
     return result['id']
 

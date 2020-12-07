@@ -147,6 +147,25 @@
         cmd: >
           python3 configure_node.py dummy --root_password {{vantage6_root_password}} --username dummy --password
           {{dummy_password}} --host {{vserver_host}} --port 5000 --email {{admin_email}}
+      register: stdout
+
+    - name: Check output
+      debug:
+        var: stdout.stdout_lines[-1]
+
+    - name: Create config file for node
+      become: yes
+      vars:
+        node_api_key: "{{stdout.stdout_lines[-1]}}"
+      template:
+        src: files/node/dummy.yaml
+        dest: /app/dummy.yaml
+
+    - name: Run node
+      become: yes
+      shell:
+        chdir: /app
+        cmd: vnode stop --system -n dummy && vnode start --system -c dummy.yaml -e prod
 
 - name: Install docker registry and push python algorithms
   roles:
@@ -228,7 +247,7 @@
       copy:
         src: files/certs/{{registry_host}}.crt
         dest: /etc/docker/certs.d/{{registry_host}}:443/ca.crt
-    - name: Check if images can be pulled from registry
-      become: yes
-      shell:
-        cmd: "docker pull {{registry_host}}:443/v6-carrier-py"
+#    - name: Check if images can be pulled from registry
+#      become: yes
+#      shell:
+#        cmd: "docker pull {{registry_host}}:443/v6-carrier-py"
