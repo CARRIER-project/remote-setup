@@ -22,7 +22,8 @@ ORGANIZATION_BASE = ORGANIZATION = {'address1': 'my address 1, Amsterdam',
 @click.option('--host', default='localhost', prompt=True)
 @click.option('--port', default=DEFAULT_PORT, prompt=True)
 @click.option('--email', prompt=True)
-def create_node(name, root_password, username, password, host, port, email):
+@click.option('--encrypted', default=True)
+def create_node(name, root_password, username, password, host, port, email, encrypted):
     client = VantageClient(ROOT, root_password, host, port)
 
     click.echo('Creating new organization')
@@ -33,15 +34,16 @@ def create_node(name, root_password, username, password, host, port, email):
     # Create node
     client = VantageClient(username, password, host, port)
 
-    collaboration_id = create_collaboration(client, org_id)
+    collaboration_id = create_collaboration(client, org_id, encrypted)
 
     result = client.post('node', {'collaboration_id': collaboration_id, 'organization_id': org_id})
 
     click.echo(result['api_key'])
 
 
-def create_collaboration(client, org_id):
-    result = client.post('collaboration', {'organization_ids': [org_id], 'name': f'dummy{org_id}'})
+def create_collaboration(client, org_id, encrypted):
+    result = client.post('collaboration',
+                         {'organization_ids': [org_id], 'name': f'dummy{org_id}', 'encrypted': encrypted})
 
     return result['id']
 

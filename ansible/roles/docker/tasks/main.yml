@@ -1,5 +1,7 @@
 ---
 # tasks file for docker
+
+
 - name: Install prerequisites for using apt update_cache
   become: yes
   apt:
@@ -41,10 +43,14 @@
       - docker
       - requests
       - docker-compose
-- name: install docker compose
+
+- name: Download docker compose
   become: yes
-  shell:
-    cmd: curl -L "https://github.com/docker/compose/releases/download/1.27.4/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+  get_url:
+    url: >-
+      https://github.com/docker/compose/releases/download/1.27.4/docker-compose-{{lookup('pipe', 'uname -s')
+      .strip()}}-{{ lookup('pipe', 'uname -m') }}
+    dest: /usr/local/bin/docker-compose
 
 - name: Change permissions docker compose
   become: yes

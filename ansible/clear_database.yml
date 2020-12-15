@@ -1,0 +1,18 @@
+- name: Clear database
+  hosts:
+    - databases
+  tasks:
+    - name: Stop database
+      become: yes
+      shell:
+        chdir: /app
+        cmd: docker-compose down
+    - name: Remove data
+      become: yes
+      shell:
+        cmd: rm -rf /app/pgdata
+    - name: Start database
+      become: yes
+      shell:
+        chdir: /app
+        cmd: docker-compose up -d

@@ -1,0 +1,20 @@
+version: "3.4"
+services:
+  dummy:
+    container_name: vantage6-dummy-user
+    image: "harbor.vantage6.ai/infrastructure/node:latest"
+    command: "vnode-local start -c /mnt/config/dummy.yaml --dockerized -e prod"
+    volumes:
+      - ./dummy.yaml:/mnt/config/dummy.yaml
+      - ./diabetes.csv:/mnt/database/database.csv
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./node_rsa:/mnt/private_key.pem
+      - dummy-shared-volume:/mnt/data
+    environment:
+      - DATA_VOLUME_NAME=dummy-shared-volume
+      - DATABASE_URI=/mnt/database/database.csv
+      - PRIVATE_KEY=/mnt/private_key.pem
+
+volumes:
+  dummy-shared-volume:
+    name: dummy-shared-volume

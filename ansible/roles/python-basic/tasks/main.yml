@@ -8,3 +8,10 @@
   become: yes
   shell:
     locale-gen en_US.UTF-8
+
+- name: Make sure all locale env variables are set correctly
+  become: yes
+  copy:
+    dest: /etc/profile.d/locale-fix-extra.sh
+    content: "export LC_ALL=C.UTF-8"
+    mode: 0644
