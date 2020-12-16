@@ -175,21 +175,22 @@
         src: files/node/dummy.yaml
         dest: /app/dummy.yaml
 
-#    - name: Run node
-#      become: yes
-#      shell:
-#        chdir: /app
-#        cmd: docker-compose down && docker-compose up -d
+    # TODO: Running node in a unsafe way because a bug needs to be fixed in vantage6
     - name: Run node
-      # TODO: The environment is already supposed to be set correctly but somehow python still complains about the
-      # locales not being set correctly
-      environment:
-        LC_ALL: "C.UTF-8"
-        LANG: "C.UTF-8"
       become: yes
       shell:
         chdir: /app
-        cmd: vnode start -c dummy.yaml -e prod
+        cmd: docker-compose up -d
+#    - name: Run node
+#      # TODO: The environment is already supposed to be set correctly but somehow python still complains about the
+#      # locales not being set correctly
+#      environment:
+#        LC_ALL: "C.UTF-8"
+#        LANG: "C.UTF-8"
+#      become: yes
+#      shell:
+#        chdir: /app
+#        cmd: vnode start -c dummy.yaml -e prod
 
 - name: Install docker registry and push python algorithms
   roles:
