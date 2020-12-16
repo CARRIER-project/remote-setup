@@ -3,7 +3,7 @@ services:
   dummy:
     container_name: vantage6-dummy-user
     image: "harbor.vantage6.ai/infrastructure/node:latest"
-    command: "vnode-local start -c /mnt/config/dummy.yaml --dockerized -e prod"
+    command: "vnode-local start -c /mnt/config/dummy.yaml --dockerized"
     volumes:
       - ./dummy.yaml:/mnt/config/dummy.yaml
       - ./diabetes.csv:/mnt/database/database.csv
