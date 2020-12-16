@@ -1,12 +1,13 @@
 # remote-setup
 General utility files and script for setting up vantage6 on a remote server.
 
-Before you can install anything on your server you will have to install git and clone the repository like so:
-```bash
-sudo apt update
-sudo apt install git
-git clone https://github.com/CARRIER-project/remote-setup.git
-```
+## Prerequisites
+- [Ansible](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html)
 
-## Installing the vantage6 database on HPC cloud
-In your homedir execute the following:
+## Deploying the infrastructure
+You will need to do the following steps:
+1. Clone the repository
+1. Copy `[PROJECT_ROOT]/ansible/hosts.example.yml` to `[PROJECT_ROOT]/ansible/hosts.yml`
+1. Fill in the blanks in the `hosts.yml` file. Make sure there are ip adresses filled in for every host type.
+1. In the terminal, cd to `[PROJECT_ROOT]/ansible`
+1. Run `ansible-playbook -i hosts.yml -u ubuntu main.yml`
