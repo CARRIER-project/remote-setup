@@ -45,3 +45,9 @@ When doing this outside of ansible it will involve using the [openssl command li
 The generated self-signed certificate needs to be copied to all nodes that will pull from the registry in the following path:
 `/etc/docker/certs.d/REGISTRY_HOST:443/ca.crt`
 
+### Pushing algorithms to the docker registry
+The [vantage6-algorithms](https://github.com/CARRIER-project/vantage6-algorithms) repository contains algorithms that work with vantage6.
+It also contains a script to push these algorithms to a specified registry. It can be done like so:
+```shell
+VANTAGE6_ALGORITHMS_REPO/push_to_remote_registry.sh REGISTRY_HOST
+```
