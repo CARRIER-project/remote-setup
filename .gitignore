@@ -3,6 +3,7 @@ diabetes.csv
 venv/
 lokum/config/variables.tf
 ansible/hosts
-ansible/hosts.ymlansible/files/certs
+ansible/hosts.yml
+ansible/files/certs
 .ipynb_checkpoints
 ansible/files/certs
