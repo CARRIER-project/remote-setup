@@ -26,7 +26,7 @@ Example:
 python download_sample_data.py --target diabetes.csv
 ```
 
-# Adding a node to the vantage6 server
+### Adding a node to the vantage6 server
 [ansible/files/node/configure_node.py](ansible/files/node/configure_node.py) is a cli script that automates the process of creating a new organization, collaboration and node for vantage6.
 
 
@@ -36,4 +36,12 @@ python configure_node.py ORGANIZATION_NAME
 ```
 Where `ORGANIZATION_NAME` needs to be replaced with the name of the organization that this nodes belongs to. The CLI will prompt you for additional information.
 
+### Deploying a docker registry
+For testing purposes, you can set up a docker registry with a self-signed certificate to which you can deploy your vantage6 algorithms.
+
+[ansible/files/registry/docker-compose.yml](ansible/files/registry/docker-compose.yml) contains the docker compose to run the registry, but you have to do some additional steps that can be found [in the main ansible file](https://github.com/CARRIER-project/remote-setup/blob/f8ccccc1b2dd6669836a5ad0c6b10a2bffeec636/ansible/main.yml#L195)
+When doing this outside of ansible it will involve using the [openssl command line utilities](https://wiki.openssl.org/index.php/Command_Line_Utilities).
+
+The generated self-signed certificate needs to be copied to all nodes that will pull from the registry in the following path:
+`/etc/docker/certs.d/REGISTRY_HOST:443/ca.crt`
 
