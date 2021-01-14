@@ -1,0 +1,50 @@
+- name: Mount scratch disk
+  hosts:
+    - harbor-registries
+  roles:
+    - self-signed-certificate
+  become: yes
+  vars:
+    scratch_device: "/dev/vdb"
+    scratch_fstype: "ext4"
+    scratch_mount_point: "/mnt/scratch"
+    harbor_version: "v2.1.3"
+    app_dir: "/app"
+
+  # TODO: Formatting and mounting the scratch disk should be a role
+  tasks:
+    - name: Format scratch disk
+      filesystem:
+        dev: "{{scratch_device}}"
+        fstype: "{{scratch_fstype}}"
+
+    - name: Create scratch mount point
+      file:
+        state: "directory"
+        path: "{{scratch_mount_point}}"
+
+    - name: Mount scratch disk
+      mount:
+        fstype: "{{scratch_fstype}}"
+        path: "{{scratch_mount_point}}"
+        src: "{{scratch_device}}"
+        state: "mounted"
+    - name: Create app dir
+      file:
+        state: "directory"
+        path: "{{app_dir}}"
+
+    - name: Download harbor
+      get_url:
+        url: >
+          https://github.com/goharbor/harbor/releases/download/{{harbor_version}}/harbor-online-installer-{{harbor_version}}.tgz
+        dest: "{{app_dir}}/harbor_installer.tgz"
+
+      # TODO: Verify file
+
+    - name: Unpack installer
+      unarchive:
+        dest: "{{app_dir}}"
+        remote_src: yes
+        src: "{{app_dir}}/harbor_installer.tgz"
+
