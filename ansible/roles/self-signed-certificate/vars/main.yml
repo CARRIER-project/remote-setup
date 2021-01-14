@@ -1,4 +1,5 @@
 ---
 # vars file for self-signed-certificate
-certificates_path: "/app/certs"
+csr_path: "/app/certs/{{inventory_hostname}}.csr"
+certificate_path: "/app/certs/{{inventory_hostname}}.crt"
 private_key_path: "/app/certs/{{inventory_hostname}}.key"
