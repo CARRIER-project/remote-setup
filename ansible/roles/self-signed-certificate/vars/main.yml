@@ -1,0 +1,4 @@
+---
+# vars file for self-signed-certificate
+certificates_path: "/app/certs"
+private_key_path: "/app/certs/{{inventory_hostname}}.key"

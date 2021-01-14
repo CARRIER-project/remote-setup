@@ -1,0 +1,34 @@
+---
+- name: Install cryptography libraries
+  become: yes
+  pip:
+    name:
+      - cryptography
+      - PyOpenSSL
+# tasks file for self-signed-certificate
+- name: Create certs dir
+  become: yes
+  file:
+    path: /app/certs
+    state: directory
+
+- name: Create private key
+  become: yes
+  openssl_privatekey:
+    path: "{{private_key_path}}"
+    size: 2048
+
+- name: Create csr
+  become: yes
+  openssl_csr:
+    path: "{{certificates_path}}/{{inventory_hostname}}.csr"
+    privatekey_path: "{{private_key_path}}"
+    subject_alt_name: "IP:{{inventory_hostname}}"
+
+- name: Create certificate
+  become: yes
+  openssl_certificate:
+    path: /app/certs/{{inventory_hostname}}.crt
+    privatekey_path: /app/certs/{{inventory_hostname}}.key
+    csr_path: /app/certs/{{inventory_hostname}}.csr
+    provider: selfsigned
