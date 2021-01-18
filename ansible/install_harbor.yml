@@ -3,6 +3,7 @@
     - harbor-registries
   roles:
     - self-signed-certificate
+    - docker
   become: yes
   vars:
     scratch_device: "/dev/vdb"
@@ -47,4 +48,14 @@
         dest: "{{app_dir}}"
         remote_src: yes
         src: "{{app_dir}}/harbor_installer.tgz"
+
+    - name: Copy harbor config to harbor dir
+      template:
+        src: files/harbor/harbor.yml
+        dest: "{{app_dir}}/harbor/harbor.yml"
+
+    - name: Install harbor
+      shell:
+        chdir: "{{app_dir}}/harbor"
+        cmd: "./install.sh"
 
