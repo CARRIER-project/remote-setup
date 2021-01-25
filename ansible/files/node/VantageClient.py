@@ -10,6 +10,12 @@ OK_RESPONSES = [200, 201]
 POST = 'POST'
 
 
+class NotOkResponse(Exception):
+    def __init__(self, status_code):
+        super(self)
+        self.status_code = status_code
+
+
 class VantageClient:
     """
     Custom made vantage client to work around some problems the official has at the moment (such as authenticating root
@@ -68,4 +74,4 @@ class VantageClient:
         if response.status_code in OK_RESPONSES:
             return response.json()
         else:
-            raise Exception(f'Request returned status {response.status_code}\nMessage: {response.content}')
+            raise NotOkResponse(response.status_code)

@@ -2,7 +2,7 @@
 
 import click
 
-from VantageClient import VantageClient
+from VantageClient import VantageClient, NotOkResponse
 
 LOCALHOST = 'localhost'
 DEFAULT_PORT = 5000
@@ -60,8 +60,14 @@ def create_organization(client, name):
 def create_user(client, organization_id, username, password, email):
     user = {'firstname': ' ', 'lastname': ' ', 'username': username, 'organization_id': organization_id,
             'password': password, 'roles': ['admin'], 'email': email}
-    result = client.post('user', user)
-    click.echo(f'Created new user:\n{result}')
+
+    try:
+        result = client.post('user', user)
+        click.echo(f'Created new user:\n{result}')
+    except NotOkResponse as e:
+        # If status code is 400 user has already been created
+        if e.status_code != 400:
+            raise e
 
 
 if __name__ == '__main__':
