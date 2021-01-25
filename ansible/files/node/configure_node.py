@@ -66,7 +66,9 @@ def create_user(client, organization_id, username, password, email):
         click.echo(f'Created new user:\n{result}')
     except NotOkResponse as e:
         # If status code is 400 user has already been created
-        if e.status_code != 400:
+        if e.status_code == 400:
+            click.echo('User {username} has been created before. Skipping user creation.')
+        else:
             raise e
 
 
