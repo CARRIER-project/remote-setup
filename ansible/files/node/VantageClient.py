@@ -12,7 +12,7 @@ POST = 'POST'
 
 class NotOkResponse(Exception):
     def __init__(self, status_code):
-        super(self)
+        super().__init__()
         self.status_code = status_code
 
 

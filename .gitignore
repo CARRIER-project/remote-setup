@@ -7,3 +7,4 @@ ansible/hosts.yml
 ansible/files/certs
 .ipynb_checkpoints
 ansible/files/certs
+__pycache__/
