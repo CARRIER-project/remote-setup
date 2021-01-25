@@ -1,0 +1,25 @@
+---
+# tasks file for ca-certificate
+- name: Install snapd
+  apt:
+    name: snapd
+    update_cache: yes
+
+- name: Install certbot
+  become: yes
+  snap:
+    name: certbot
+    classic: yes
+
+- name: Link certbot executable
+  become: yes
+  file:
+    state: link
+    src: /snap/bin/certbot
+    path: /usr/bin/certbot
+
+- name: Run certbot
+  become: yes
+  shell:
+    chdir: "/app"
+    cmd: "certbot certonly --standalone"
