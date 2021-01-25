@@ -14,7 +14,6 @@ services:
       - DATA_VOLUME_NAME=dummy-shared-volume
       - DATABASE_URI=/mnt/database/database.csv
       - PRIVATE_KEY=/mnt/private_key.pem
-
 volumes:
   dummy-shared-volume:
     name: dummy-shared-volume
