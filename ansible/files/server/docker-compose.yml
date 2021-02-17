@@ -1,7 +1,7 @@
 version: "3.4"
 services:
   vserver:
-    image: "harbor.vantage6.ai/infrastructure/server:latest"
+    image: "harbor.vantage6.ai/infrastructure/server:2.0.0a3"
     volumes:
       - /app/vserver-hpc-cloud.yml:/mnt/config.yml
     command: vserver-local start -c /mnt/config.yml
