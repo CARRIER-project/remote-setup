@@ -59,7 +59,7 @@ def create_organization(client, name):
 
 def create_user(client, organization_id, username, password, email):
     user = {'firstname': ' ', 'lastname': ' ', 'username': username, 'organization_id': organization_id,
-            'password': password, 'roles': ['admin'], 'email': email}
+            'password': password, 'roles': [3], 'email': email}
     result = client.post('user', user)
     click.echo(f'Created new user:\n{result}')
 
