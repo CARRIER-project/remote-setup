@@ -1,0 +1,4 @@
+{
+    "data-root": "/mnt/scratch/docker-data",
+    "storage-driver": "overlay2"
+}

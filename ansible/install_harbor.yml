@@ -1,4 +1,4 @@
-- name: Mount scratch disk
+- name: Install harbor
   hosts:
     - harbor-registries
   roles:
@@ -31,6 +31,29 @@
         path: "{{scratch_mount_point}}"
         src: "{{scratch_device}}"
         state: "mounted"
+
+    - name: Add docker data dir
+      file:
+        state: "directory"
+        path: "{{scratch_mount_point}}/docker-data"
+        mode: 755
+
+    - name: Harbor data dir
+      file:
+        state: "directory"
+        path: "{{scratch_mount_point}}/harbor-data"
+        mode: 755
+
+
+    - name: Configure docker data location
+      copy:
+        src: "files/harbor/daemon.json"
+        dest: "/etc/docker/daemon.json"
+
+    - name: Restart docker
+      shell:
+        cmd: "systemctl restart docker"
+
     - name: Create app dir
       file:
         state: "directory"
