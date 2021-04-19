@@ -36,13 +36,13 @@
       file:
         state: "directory"
         path: "{{scratch_mount_point}}/docker-data"
-        mode: 755
+        mode: 744
 
     - name: Harbor data dir
       file:
         state: "directory"
         path: "{{scratch_mount_point}}/harbor-data"
-        mode: 755
+        mode: 744
 
 
     - name: Configure docker data location
@@ -79,6 +79,7 @@
         dest: "{{app_dir}}/harbor/harbor.yml"
     # TODO: Following task will fail because there is not a CA certificate. For now the CA certificate needs to be
     #       installed manually. See https://certbot.eff.org/lets-encrypt/ubuntubionic-other
+    # Also execute ufw allow 80 otherwise certbot won't work
     - name: Install harbor
       shell:
         chdir: "{{app_dir}}/harbor"
