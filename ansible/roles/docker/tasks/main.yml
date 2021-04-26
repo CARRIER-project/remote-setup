@@ -1,14 +1,12 @@
 ---
 # tasks file for docker
-
-
 - name: Install prerequisites for using apt update_cache
   become: yes
   apt:
     pkg:
       - apt-transport-https
-      - python3-apt
       - aptitude
+
 - name: Install prerequisites for docker
   become: yes
   apt:

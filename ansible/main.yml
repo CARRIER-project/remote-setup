@@ -1,4 +1,8 @@
 ---
+- name: Mount scratch disk
+  hosts:
+    - databases
+
 - name: Install postgres database
   hosts:
     - databases
@@ -34,8 +38,6 @@
 - name: Configure vantage6 server
   hosts:
     servers
-  roles:
-    - vantage6
   tasks:
     - name: Create app dir
       become: yes
@@ -55,11 +57,17 @@
 
     - name: Start vantage6 server
       become: yes
+      environment:
+        LC_ALL: "C.UTF-8"
+        LANG: "C.UTF-8"
       tags:
         - always
-      shell:
+      ignore_errors: yes
+      command:
         chdir: /app
-        cmd: docker-compose down && docker-compose up -d
+        cmd: vserver start --detach -c /app/vserver-hpc-cloud.yml
+
+
     - name: Check whether the vantage6 server is running
       register: result
       tags:
@@ -128,6 +136,7 @@
           - click
           - requests
           - bcrypt
+          - pandas
     - name: Download sample data
       # TODO: The environment is already supposed to be set correctly but somehow python still complains about the
       # locales not being set correctly

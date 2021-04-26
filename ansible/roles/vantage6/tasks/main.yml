@@ -2,7 +2,3 @@
 # tasks file for vantage6
 
 
-- name: 'Install vantage6 through pip'
-  become: yes
-  pip:
-    name: vantage6

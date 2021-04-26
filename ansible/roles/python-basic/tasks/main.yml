@@ -4,14 +4,15 @@
     pkg:
       - python3-setuptools
       - python3-pip
-- name: Configure locales
-  become: yes
-  shell:
-    locale-gen en_US.UTF-8
 
-- name: Make sure all locale env variables are set correctly
+- name: Install locales
+  locale_gen: name={{ item }} state=present
+  with_items:
+    - en_US.UTF-8
+
+
+- name: Install locales for root user
   become: yes
-  copy:
-    dest: /etc/profile.d/locale-fix-extra.sh
-    content: "export LC_ALL=C.UTF-8"
-    mode: 0644
+  locale_gen: name={{ item }} state=present
+  with_items:
+    - en_US.UTF-8
