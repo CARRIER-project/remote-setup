@@ -1,9 +1,0 @@
-version: "3.4"
-services:
-  vserver:
-    image: "harbor.vantage6.ai/infrastructure/server:latest"
-    volumes:
-      - /app/vserver-hpc-cloud.yml:/mnt/config.yml
-    command: vserver-local start -c /mnt/config.yml
-    ports:
-      - "5000:5000"
