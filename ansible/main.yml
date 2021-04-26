@@ -67,6 +67,12 @@
         chdir: /app
         cmd: vserver start --detach -c /app/vserver-hpc-cloud.yml
 
+    - name: Open port on firewall
+      become: yes
+      ufw:
+        port: 80
+        rule: allow
+        proto: tcp
 
     - name: Check whether the vantage6 server is running
       register: result
@@ -77,6 +83,30 @@
       delay: 5
       uri:
         url: http://localhost:5000/api/version
+
+    - name: Install nginx for remote access
+      become: yes
+      apt:
+        pkg:
+          - nginx
+    - name: copy nginx config file
+      become: yes
+      copy:
+        src: files/server/nginx.conf
+        dest: /etc/nginx
+    - name: stop nginx
+      become: yes
+      command:
+        cmd: nginx -s stop
+    - name: start nginx
+      become: yes
+      command:
+        cmd: nginx
+
+    - name: reload nginx config for good measure
+      become: yes
+      command:
+        cmd: nginx -s reload
 
 #- name: Create root user in database
 #  hosts:
@@ -169,7 +199,7 @@
         chdir: /app
         cmd: >
           python3 configure_node.py dummy --root_password {{vantage6_root_password}} --username dummy --password
-          {{dummy_password}} --host {{vserver_host}} --port 5000 --email {{admin_email}}
+          {{dummy_password}} --host {{groups['servers'][0]}} --port 80 --email {{admin_email}}
       register: stdout
 
     - name: Check output
@@ -187,9 +217,10 @@
     # TODO: Running node in a unsafe way because a bug needs to be fixed in vantage6
     - name: Run node
       become: yes
+      ignore_errors: yes
       shell:
         chdir: /app
-        cmd: docker-compose up -d
+        cmd: vnode start --detach -c /app/dummy.yml
 #    - name: Run node
 #      # TODO: The environment is already supposed to be set correctly but somehow python still complains about the
 #      # locales not being set correctly
