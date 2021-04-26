@@ -1,0 +1,20 @@
+---
+# tasks file for scratch
+  # TODO: Formatting and mounting the scratch disk should be a role
+
+- name: Format scratch disk
+  filesystem:
+    dev: "{{scratch_device}}"
+    fstype: "{{scratch_fstype}}"
+
+- name: Create scratch mount point
+  file:
+    state: "directory"
+    path: "{{scratch_mount_point}}"
+
+- name: Mount scratch disk
+  mount:
+    fstype: "{{scratch_fstype}}"
+    path: "{{scratch_mount_point}}"
+    src: "{{scratch_device}}"
+    state: "mounted"

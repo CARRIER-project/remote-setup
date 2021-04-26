@@ -3,11 +3,10 @@
     - harbor-registries
   roles:
     - docker
+    - scratch
   become: yes
   vars:
-    scratch_device: "/dev/vdb"
-    scratch_fstype: "ext4"
-    scratch_mount_point: "/mnt/scratch"
+
     harbor_version: "v2.1.3"
     app_dir: "/app"
     certificate_path: "/etc/letsencrypt/live/{{inventory_hostname}}/fullchain.pem"
@@ -15,23 +14,6 @@
 
   # TODO: Formatting and mounting the scratch disk should be a role
   tasks:
-    - name: Format scratch disk
-      filesystem:
-        dev: "{{scratch_device}}"
-        fstype: "{{scratch_fstype}}"
-
-    - name: Create scratch mount point
-      file:
-        state: "directory"
-        path: "{{scratch_mount_point}}"
-
-    - name: Mount scratch disk
-      mount:
-        fstype: "{{scratch_fstype}}"
-        path: "{{scratch_mount_point}}"
-        src: "{{scratch_device}}"
-        state: "mounted"
-
     - name: Add docker data dir
       file:
         state: "directory"

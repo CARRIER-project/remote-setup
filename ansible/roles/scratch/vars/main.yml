@@ -1,0 +1,5 @@
+---
+# vars file for scratch
+scratch_device: "/dev/vdb"
+scratch_fstype: "ext4"
+scratch_mount_point: "/mnt/scratch"
